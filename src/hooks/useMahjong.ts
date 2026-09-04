@@ -81,7 +81,7 @@ export function useMahjong() {
           if (bc) {
             applyClaim(s, bc);
             render();
-            if (s.phase === "over") return;
+            if ((s.phase as string) === "over") return;
             if (bc.player === 0) {
               s.phase = "human-turn";
               render();

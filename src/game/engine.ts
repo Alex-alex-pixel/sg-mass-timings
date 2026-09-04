@@ -46,10 +46,10 @@ export type GameState = {
   log: string[];
   result: {
     kind: "win" | "draw";
-    winner?: number;
-    from?: number;
-    score?: ScoreResult;
-    points?: number;
+    winner?: number | undefined;
+    from?: number | undefined;
+    score?: ScoreResult | undefined;
+    points?: number | undefined;
   } | null;
 };
 
