@@ -35,6 +35,20 @@ const CLAIM_LABEL: Record<Claim["kind"], string> = {
 };
 
 function TablePage() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <p className="font-serif text-2xl">Shuffling the tiles…</p>
+      </div>
+    );
+  }
+  return <Table />;
+}
+
+function Table() {
   const { state, humanDiscard, humanClaim, humanPass, humanWin, restart } = useMahjong();
   const me = state.players[0]!;
   const over = state.phase === "over";
