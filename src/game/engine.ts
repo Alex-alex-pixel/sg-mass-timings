@@ -186,7 +186,7 @@ export function discard(s: GameState, pi: number, tile: Tile) {
   p.hand = removeOne(p.hand, tile);
   p.discards.push(tile);
   s.lastDiscard = { tile, from: pi };
-  pushLog(s, `${p.name} discards ${tile}.`);
+  pushLog(s, `${p.isHuman ? "You discard" : `${p.name} discards`} ${tile}.`);
 }
 
 /** All claims available to a player for the tile currently on the table. */
@@ -239,7 +239,7 @@ export function applyClaim(s: GameState, claim: Claim): void {
   const kind = claim.kind === "kong" ? "kong" : claim.kind === "pung" ? "pung" : "chow";
   p.melds.push({ kind, tiles: sortTiles([...used, d.tile]), concealed: false });
   p.hand = sortTiles(p.hand);
-  pushLog(s, `${p.name} calls ${kind} on ${d.tile}.`);
+  pushLog(s, `${p.isHuman ? "You call" : `${p.name} calls`} ${kind} on ${d.tile}.`);
   s.lastDiscard = null;
   s.turn = claim.player;
   if (kind === "kong") {
