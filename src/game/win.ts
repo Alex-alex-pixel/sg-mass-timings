@@ -21,7 +21,7 @@ export function decompose(concealed: Tile[], meldCount: number): Decomposition |
   const sorted = sortTiles(concealed);
   const c = counts(sorted);
   for (const pair of Object.keys(c)) {
-    if (c[pair] < 2) continue;
+    if ((c[pair] ?? 0) < 2) continue;
     const rest = removeOne(removeOne(sorted, pair), pair);
     const sets = takeSets(rest, need);
     if (sets) return { sets, pair };
@@ -33,7 +33,7 @@ function takeSets(tiles: Tile[], need: number): Meld[] | null {
   if (need === 0) return tiles.length === 0 ? [] : null;
   if (tiles.length < 3) return null;
   const sorted = sortTiles(tiles);
-  const t = sorted[0];
+  const t = sorted[0]!;
 
   // try triplet
   if (sorted.filter((x) => x === t).length >= 3) {
@@ -108,15 +108,15 @@ export function scoreHand(
 
   // Dragon pungs
   for (const m of allSets) {
-    if (m.kind !== "chow" && m.tiles[0][0] === "g") {
-      lines.push({ name: `${tileText(m.tiles[0])} dragon`, tai: 1 });
+    if (m.kind !== "chow" && m.tiles[0]!.charAt(0) === "g") {
+      lines.push({ name: `${tileText(m.tiles[0]!)} dragon`, tai: 1 });
     }
   }
   // Wind pungs
   for (const m of allSets) {
-    if (m.kind !== "chow" && m.tiles[0][0] === "w") {
-      if (m.tiles[0] === ctx.seatWind) lines.push({ name: "Seat wind", tai: 1 });
-      if (m.tiles[0] === ctx.roundWind) lines.push({ name: "Round wind", tai: 1 });
+    if (m.kind !== "chow" && m.tiles[0]!.charAt(0) === "w") {
+      if (m.tiles[0]! === ctx.seatWind) lines.push({ name: "Seat wind", tai: 1 });
+      if (m.tiles[0]! === ctx.roundWind) lines.push({ name: "Round wind", tai: 1 });
     }
   }
 
@@ -142,11 +142,11 @@ export function scoreHand(
   if (ctx.selfDraw) lines.push({ name: "Self-drawn", tai: 1 });
 
   // Bonus tiles
-  const animals = ctx.bonus.filter((t) => t[0] === "a");
+  const animals = ctx.bonus.filter((t) => t.charAt(0) === "a");
   for (const a of animals) lines.push({ name: `Animal (${tileText(a)})`, tai: 1 });
-  const flowers = ctx.bonus.filter((t) => t[0] === "f");
+  const flowers = ctx.bonus.filter((t) => t.charAt(0) === "f");
   const ownFlowers = flowers.filter(
-    (f) => Number(f[1]) === ctx.seatIndex + 1 || Number(f[1]) === ctx.seatIndex + 5,
+    (f) => Number(f.charAt(1)) === ctx.seatIndex + 1 || Number(f.charAt(1)) === ctx.seatIndex + 5,
   );
   for (const f of ownFlowers) lines.push({ name: `Own flower (${tileText(f)})`, tai: 1 });
   if (flowers.length === 0 && animals.length === 0) {
