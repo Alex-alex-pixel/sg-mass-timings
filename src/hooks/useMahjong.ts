@@ -44,7 +44,7 @@ export function useMahjong() {
               if (t === null) return render();
             }
             skipDraw = undefined;
-            s.humanCanWinOnDraw = canWin(s.players[0].hand, s.players[0].melds);
+            s.humanCanWinOnDraw = canWin(s.players[0]!.hand, s.players[0]!.melds);
             s.phase = "human-turn";
             render();
             return;
@@ -55,7 +55,7 @@ export function useMahjong() {
             const t = drawTile(s, pi);
             if (t === null) return render();
             render();
-            if (canWin(s.players[pi].hand, s.players[pi].melds)) {
+            if (canWin(s.players[pi]!.hand, s.players[pi]!.melds)) {
               declareWin(s, pi, true);
               render();
               return;
@@ -121,7 +121,7 @@ export function useMahjong() {
         if (bc) {
           applyClaim(s, bc);
           render();
-          if (s.phase === "over") return;
+          if ((s.phase as string) === "over") return;
           void run({ skipDrawFor: bc.player });
           return;
         }
@@ -142,9 +142,9 @@ export function useMahjong() {
       applyClaim(s, claim);
       s.humanClaims = [];
       render();
-      if (s.phase === "over") return;
+      if ((s.phase as string) === "over") return;
       s.phase = "human-turn";
-      s.humanCanWinOnDraw = canWin(s.players[0].hand, s.players[0].melds);
+      s.humanCanWinOnDraw = canWin(s.players[0]!.hand, s.players[0]!.melds);
       render();
     },
     [render],

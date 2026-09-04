@@ -56,7 +56,7 @@ export type GameState = {
 export const BOT_NAMES = ["You", "Bao", "Mei", "Wei"];
 
 export function seatWind(index: number): Tile {
-  return WINDS[index];
+  return WINDS[index]!;
 }
 
 function pushLog(s: GameState, msg: string) {
@@ -94,7 +94,7 @@ export function newGame(scores: number[] = [0, 0, 0, 0]): GameState {
   };
 
   for (let round = 0; round < 13; round++) {
-    for (const p of s.players) p.hand.push(s.wall[s.drawIdx++]);
+    for (const p of s.players) p.hand.push(s.wall[s.drawIdx++]!);
   }
   for (const p of s.players) replaceBonus(s, p);
   for (const p of s.players) p.hand = sortTiles(p.hand);
@@ -105,7 +105,7 @@ export function newGame(scores: number[] = [0, 0, 0, 0]): GameState {
 
 function drawFromBack(s: GameState): Tile | null {
   if (wallRemaining(s) <= 0) return null;
-  return s.wall[s.backIdx--];
+  return s.wall[s.backIdx--]!;
 }
 
 function replaceBonus(s: GameState, p: Player) {
@@ -113,7 +113,7 @@ function replaceBonus(s: GameState, p: Player) {
   while (guard++ < 20) {
     const bonusIdx = p.hand.findIndex(isBonus);
     if (bonusIdx < 0) break;
-    const t = p.hand[bonusIdx];
+    const t = p.hand[bonusIdx]!;
     p.hand.splice(bonusIdx, 1);
     p.bonus.push(t);
     const rep = drawFromBack(s);
@@ -128,8 +128,8 @@ export function drawTile(s: GameState, pi: number): Tile | null {
     endDraw(s);
     return null;
   }
-  const p = s.players[pi];
-  let tile = s.wall[s.drawIdx++];
+  const p = s.players[pi]!;
+  let tile: Tile = s.wall[s.drawIdx++]!;
   let guard = 0;
   while (isBonus(tile) && guard++ < 20) {
     p.bonus.push(tile);
@@ -152,7 +152,7 @@ function endDraw(s: GameState) {
 }
 
 export function declareWin(s: GameState, pi: number, selfDraw: boolean, from?: number) {
-  const p = s.players[pi];
+  const p = s.players[pi]!;
   const score = scoreHand(p.hand, p.melds, {
     seatWind: seatWind(pi),
     roundWind: s.roundWind,
@@ -169,20 +169,20 @@ export function declareWin(s: GameState, pi: number, selfDraw: boolean, from?: n
       p.score += points;
     }
   } else if (from !== undefined) {
-    s.players[from].score -= points * 3;
+    s.players[from]!.score -= points * 3;
     p.score += points * 3;
   }
   s.phase = "over";
   s.result = { kind: "win", winner: pi, from: selfDraw ? undefined : from, score, points };
   pushLog(
     s,
-    `${p.name} ${selfDraw ? "self-drew" : `won off ${s.players[from!].name}`} — ${score.tai} tai.`,
+    `${p.name} ${selfDraw ? "self-drew" : `won off ${s.players[from!]!.name}`} — ${score.tai} tai.`,
   );
   return true;
 }
 
 export function discard(s: GameState, pi: number, tile: Tile) {
-  const p = s.players[pi];
+  const p = s.players[pi]!;
   p.hand = removeOne(p.hand, tile);
   p.discards.push(tile);
   s.lastDiscard = { tile, from: pi };
@@ -193,7 +193,7 @@ export function discard(s: GameState, pi: number, tile: Tile) {
 export function claimsFor(s: GameState, pi: number): Claim[] {
   const d = s.lastDiscard;
   if (!d || d.from === pi) return [];
-  const p = s.players[pi];
+  const p = s.players[pi]!;
   const out: Claim[] = [];
   const n = p.hand.filter((t) => t === d.tile).length;
 
@@ -226,14 +226,14 @@ const PRIORITY: Record<ClaimKind, number> = { win: 3, kong: 2, pung: 2, chow: 1 
 
 export function applyClaim(s: GameState, claim: Claim): void {
   const d = s.lastDiscard!;
-  const p = s.players[claim.player];
+  const p = s.players[claim.player]!;
   if (claim.kind === "win") {
     p.hand = sortTiles([...p.hand, d.tile]);
-    s.players[d.from].discards.pop();
+    s.players[d.from]!.discards.pop();
     declareWin(s, claim.player, false, d.from);
     return;
   }
-  s.players[d.from].discards.pop();
+  s.players[d.from]!.discards.pop();
   const used = claim.tiles ?? [];
   for (const t of used) p.hand = removeOne(p.hand, t);
   const kind = claim.kind === "kong" ? "kong" : claim.kind === "pung" ? "pung" : "chow";
@@ -295,8 +295,8 @@ export function tileValue(hand: Tile[], t: Tile): number {
 }
 
 export function botDiscard(s: GameState, pi: number): Tile {
-  const p = s.players[pi];
-  let worst = p.hand[0];
+  const p = s.players[pi]!;
+  let worst: Tile = p.hand[0]!;
   let worstV = Infinity;
   for (const t of p.hand) {
     const v = tileValue(p.hand, t);

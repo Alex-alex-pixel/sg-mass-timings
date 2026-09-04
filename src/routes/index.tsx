@@ -36,7 +36,7 @@ const CLAIM_LABEL: Record<Claim["kind"], string> = {
 
 function TablePage() {
   const { state, humanDiscard, humanClaim, humanPass, humanWin, restart } = useMahjong();
-  const me = state.players[0];
+  const me = state.players[0]!;
   const over = state.phase === "over";
 
   return (
@@ -78,7 +78,7 @@ function TablePage() {
               </h2>
               {state.lastDiscard && (
                 <span className="text-[0.8rem] text-muted-foreground">
-                  {state.players[state.lastDiscard.from].name} threw{" "}
+                  {state.players[state.lastDiscard.from]!.name} threw{" "}
                   <span className="text-brass">{tileText(state.lastDiscard.tile)}</span>
                 </span>
               )}
@@ -186,7 +186,7 @@ function TablePage() {
               ) : (
                 <>
                   <h2 className="font-serif text-xl font-semibold">
-                    {state.players[state.result.winner!].name} wins ·{" "}
+                    {state.players[state.result.winner!]!.name} wins ·{" "}
                     {state.result.score!.tai} tai
                     {state.result.score!.capped ? " (capped)" : ""}
                   </h2>
@@ -202,7 +202,7 @@ function TablePage() {
                   <p className="mt-3 text-[0.9rem]">
                     {state.result.from === undefined
                       ? `Self-drawn — each opponent pays ${state.result.points} points.`
-                      : `${state.players[state.result.from].name} threw the winning tile and pays ${state.result.points! * 3} points.`}
+                      : `${state.players[state.result.from]!.name} threw the winning tile and pays ${state.result.points! * 3} points.`}
                   </p>
                 </>
               )}
