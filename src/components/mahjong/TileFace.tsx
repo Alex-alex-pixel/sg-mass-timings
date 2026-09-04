@@ -12,8 +12,31 @@ const SUIT_COLOR: Record<string, string> = {
 
 type Size = "sm" | "md" | "lg";
 
+/** Compact glyphs so honour, flower and animal tiles fit the small size. */
+const SHORT: Record<string, string> = {
+  we: "E",
+  ws: "S",
+  ww: "W",
+  wn: "N",
+  gr: "R",
+  gg: "G",
+  gw: "\u25A1",
+  f1: "F1",
+  f2: "F2",
+  f3: "F3",
+  f4: "F4",
+  f5: "S1",
+  f6: "S2",
+  f7: "S3",
+  f8: "S4",
+  a1: "\u732B",
+  a2: "\u9F20",
+  a3: "\u9E21",
+  a4: "\u87F2",
+};
+
 const SIZES: Record<Size, string> = {
-  sm: "h-9 w-7 text-[0.6rem]",
+  sm: "h-9 w-7 text-[0.68rem]",
   md: "h-12 w-9 text-[0.72rem]",
   lg: "h-16 w-12 text-[0.85rem]",
 };
@@ -42,7 +65,7 @@ export function TileFace({
     </>
   ) : (
     <span className="px-0.5 text-center leading-tight font-medium">
-      {TILE_LABEL[tile] ?? tile}
+      {size === "sm" ? (SHORT[tile] ?? tile) : (TILE_LABEL[tile] ?? tile)}
     </span>
   );
 
