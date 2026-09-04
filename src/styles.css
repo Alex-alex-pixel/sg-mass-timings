@@ -51,6 +51,16 @@
   --color-brass: var(--brass);
   --color-olive: var(--olive);
   --color-burgundy: var(--burgundy);
+  --color-felt: var(--felt);
+  --color-felt-deep: var(--felt-deep);
+  --color-tile: var(--tile);
+  --color-tile-edge: var(--tile-edge);
+  --color-tile-back: var(--tile-back);
+  --color-tile-back-edge: var(--tile-back-edge);
+  --color-ink: var(--ink);
+  --color-jade: var(--jade);
+  --color-cobalt: var(--cobalt);
+  --color-vermilion: var(--vermilion);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
