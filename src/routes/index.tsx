@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useMahjong } from "../hooks/useMahjong";
 import { TileFace } from "../components/mahjong/TileFace";
 import { BotSeat } from "../components/mahjong/BotSeat";
@@ -162,7 +163,7 @@ function Table() {
                   </div>
                 ))}
                 {me.bonus.length > 0 && (
-                  <div className="flex gap-0.5">
+                  <div className="flex items-center gap-0.5" aria-label="Your flowers and animals">
                     {me.bonus.map((t, i) => (
                       <TileFace key={i} tile={t} size="md" />
                     ))}
