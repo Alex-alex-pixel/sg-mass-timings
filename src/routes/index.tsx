@@ -1,159 +1,272 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
-import { areas, churches, isComplete, CONTACT_EMAIL } from "../data/churches";
-import { StatsBand } from "../components/StatsBand";
-import { ChurchRow } from "../components/ChurchRow";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useMahjong } from "../hooks/useMahjong";
+import { TileFace } from "../components/mahjong/TileFace";
+import { BotSeat } from "../components/mahjong/BotSeat";
+import { seatWind, wallRemaining, type Claim } from "../game/engine";
+import { TILE_LABEL, tileText } from "../game/tiles";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: TablePage,
   head: () => ({
     meta: [
-      { title: "Mass Times SG — Catholic churches in Singapore" },
+      { title: "Kaki Mahjong — Play Singapore Mahjong Against Three Bots" },
       {
         name: "description",
         content:
-          "All 32 parishes of the Archdiocese of Singapore in one list — verified locations, Mass and Confession times sourced directly from parish schedules.",
+          "A browser mahjong table using Singapore rules: 148 tiles with flowers and animals, pung, kong and chow claims, and tai scoring capped at 5 tai. Play solo against three computer players.",
       },
-      { property: "og:title", content: "Mass Times SG — Catholic churches in Singapore" },
+      { property: "og:title", content: "Kaki Mahjong — Singapore rules, played solo" },
       {
         property: "og:description",
         content:
-          "All 32 parishes of the Archdiocese of Singapore in one list — verified locations, Mass and Confession times.",
+          "Play a full hand of Singapore mahjong in the browser against three computer players, with tai scoring and animals.",
       },
-      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Mass Times SG",
-          description:
-            "Verified Mass and Confession times for all 32 parishes of the Archdiocese of Singapore.",
-        }),
-      },
-    ],
   }),
 });
 
-function Index() {
-  const [query, setQuery] = useState("");
-  const [activeArea, setActiveArea] = useState("All");
+const CLAIM_LABEL: Record<Claim["kind"], string> = {
+  win: "Win!",
+  kong: "Kong",
+  pung: "Pung",
+  chow: "Chow",
+};
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return churches.filter((c) => {
-      const matchesArea =
-        activeArea === "All"
-          ? true
-          : activeArea === "Needs info"
-            ? !isComplete(c)
-            : c.area === activeArea;
-      const matchesQuery =
-        !q ||
-        c.name.toLowerCase().includes(q) ||
-        c.address.toLowerCase().includes(q) ||
-        c.area.toLowerCase().includes(q);
-      return matchesArea && matchesQuery;
-    });
-  }, [query, activeArea]);
+function TablePage() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <p className="font-serif text-2xl">Shuffling the tiles…</p>
+      </div>
+    );
+  }
+  return <Table />;
+}
+
+function Table() {
+  const { state, humanDiscard, humanClaim, humanPass, humanWin, restart } = useMahjong();
+  const me = state.players[0]!;
+  const over = state.phase === "over";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="mx-auto max-w-3xl px-6 pt-14 pb-7">
-        <svg
-          className="mb-5 size-6.5 text-brass"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          aria-hidden
-        >
-          <path d="M12 2v20M6 8h12" strokeLinecap="round" />
-        </svg>
-        <h1 className="font-serif text-4xl font-semibold tracking-tight">
-          Mass Times SG
-        </h1>
-        <p className="mt-2 max-w-[58ch] text-[0.98rem] leading-relaxed text-muted-foreground">
-          All 32 parishes of the Archdiocese of Singapore, in one list. Location
-          is confirmed for nearly every parish; Mass and Confession times are
-          added as each parish is verified.
-        </p>
-        <StatsBand />
-      </header>
+      <div className="mx-auto grid max-w-6xl gap-5 px-5 py-8 lg:grid-cols-[1fr_20rem]">
+        <div>
+          <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="font-serif text-3xl font-semibold tracking-tight">
+                Kaki Mahjong
+              </h1>
+              <p className="mt-1 text-[0.9rem] text-muted-foreground">
+                Singapore rules · you play East against three bots ·{" "}
+                <Link to="/rules" className="text-brass hover:underline">
+                  read the rules
+                </Link>
+              </p>
+            </div>
+            <div className="text-right text-[0.8rem] text-muted-foreground">
+              <div>Round wind: {TILE_LABEL[state.roundWind]}</div>
+              <div>{wallRemaining(state)} tiles left in the wall</div>
+            </div>
+          </header>
 
-      <main className="mx-auto max-w-3xl px-6 pb-20">
-        <div className="relative mt-2">
-          <Search
-            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by parish name or area…"
-            aria-label="Search parishes by name or area"
-            className="w-full rounded-sm border border-border bg-card py-2.5 pr-4 pl-10 text-[0.95rem] transition-shadow outline-none focus-visible:ring-2 focus-visible:ring-brass"
-          />
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter by area">
-          {areas.map((area) => (
-            <button
-              key={area}
-              type="button"
-              aria-pressed={area === activeArea}
-              onClick={() => setActiveArea(area)}
-              className={`cursor-pointer rounded-sm border px-3.5 py-2 text-[0.85rem] transition-colors ${
-                area === activeArea
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground/40"
-              }`}
-            >
-              {area}
-            </button>
-          ))}
-        </div>
-
-        <p className="mt-5 mb-1.5 text-[0.82rem] text-muted-foreground" aria-live="polite">
-          {filtered.length} of {churches.length} parishes
-        </p>
-
-        {filtered.length ? (
-          <ul className="border-t border-border">
-            {filtered.map((c) => (
-              <ChurchRow key={c.name} church={c} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {state.players.slice(1).map((p) => (
+              <BotSeat key={p.index} player={p} active={state.turn === p.index && !over} />
             ))}
-          </ul>
-        ) : (
-          <div className="border-t border-border px-1 py-10 text-[0.92rem] text-muted-foreground">
-            No parishes match that search.
           </div>
-        )}
-      </main>
 
-      <footer className="mx-auto max-w-3xl px-6 pb-16 text-[0.8rem] leading-relaxed text-muted-foreground">
-        <p>
-          Addresses are sourced from the Archdiocese of Singapore and individual
-          parish records; Mass and Confession times are added only once
-          confirmed directly from a parish's own published schedule — nothing
-          here is estimated to look more complete than it is.
-        </p>
-        <p className="mt-4">
-          Run a parish, or spotted an error?{" "}
-          <a
-            className="text-brass underline-offset-2 hover:underline"
-            href={`mailto:${CONTACT_EMAIL}?subject=Mass%20Times%20SG%20—%20update`}
+          {/* Table centre */}
+          <section
+            className="mt-4 rounded-lg border border-border bg-felt-deep p-4"
+            aria-label="Discard pile"
           >
-            Email an update
-          </a>{" "}
-          and it'll be reviewed and added.
-        </p>
-      </footer>
+            <div className="flex items-center justify-between">
+              <h2 className="text-[0.75rem] tracking-widest text-muted-foreground uppercase">
+                Table
+              </h2>
+              {state.lastDiscard && (
+                <span className="text-[0.8rem] text-muted-foreground">
+                  {state.players[state.lastDiscard.from]!.name} threw{" "}
+                  <span className="text-brass">{tileText(state.lastDiscard.tile)}</span>
+                </span>
+              )}
+            </div>
+            <div className="mt-3 flex min-h-16 flex-wrap gap-1">
+              {state.players.flatMap((p) =>
+                p.discards.map((t, i) => (
+                  <TileFace
+                    key={`${p.index}-${i}-${t}`}
+                    tile={t}
+                    size="sm"
+                    highlighted={
+                      state.lastDiscard?.from === p.index && i === p.discards.length - 1
+                    }
+                  />
+                )),
+              )}
+              {state.players.every((p) => p.discards.length === 0) && (
+                <p className="text-[0.85rem] text-muted-foreground">No discards yet.</p>
+              )}
+            </div>
+          </section>
+
+          {/* Human seat */}
+          <section
+            className="mt-4 rounded-lg border border-brass/40 bg-card/70 p-4"
+            aria-label="Your hand"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="font-serif text-lg font-semibold">
+                Your hand
+                <span className="ml-2 text-[0.7rem] font-normal tracking-wide text-muted-foreground uppercase">
+                  {TILE_LABEL[seatWind(0)]} · {me.score} pts
+                </span>
+              </h2>
+              <p className="text-[0.85rem] text-muted-foreground" aria-live="polite">
+                {over
+                  ? "Hand over."
+                  : state.phase === "human-turn"
+                    ? "Your turn — pick a tile to discard."
+                    : state.phase === "human-claim"
+                      ? "You can claim that discard."
+                      : "Waiting for the other players…"}
+              </p>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {me.hand.map((t, i) => (
+                <TileFace
+                  key={`${t}-${i}`}
+                  tile={t}
+                  size="lg"
+                  onClick={() => humanDiscard(t)}
+                  disabled={state.phase !== "human-turn"}
+                  label={`Discard ${tileText(t)}`}
+                />
+              ))}
+            </div>
+
+            {(me.melds.length > 0 || me.bonus.length > 0) && (
+              <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">
+                {me.melds.map((m, i) => (
+                  <div key={i} className="flex gap-0.5">
+                    {m.tiles.map((t, j) => (
+                      <TileFace key={j} tile={t} size="md" />
+                    ))}
+                  </div>
+                ))}
+                {me.bonus.length > 0 && (
+                  <div className="flex items-center gap-0.5" aria-label="Your flowers and animals">
+                    {me.bonus.map((t, i) => (
+                      <TileFace key={i} tile={t} size="md" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {state.phase === "human-turn" && state.humanCanWinOnDraw && (
+                <ActionButton onClick={humanWin} primary>
+                  Declare win (self-draw)
+                </ActionButton>
+              )}
+              {state.phase === "human-claim" &&
+                state.humanClaims.map((c, i) => (
+                  <ActionButton key={i} onClick={() => humanClaim(c)} primary={c.kind === "win"}>
+                    {CLAIM_LABEL[c.kind]}
+                    {c.tiles && c.kind === "chow"
+                      ? ` (${c.tiles.map(tileText).join(" ")})`
+                      : ""}
+                  </ActionButton>
+                ))}
+              {state.phase === "human-claim" && (
+                <ActionButton onClick={humanPass}>Pass</ActionButton>
+              )}
+              {over && <ActionButton onClick={restart} primary>Deal a new hand</ActionButton>}
+            </div>
+          </section>
+
+          {over && state.result && (
+            <section className="mt-4 rounded-lg border border-brass bg-card p-4">
+              {state.result.kind === "draw" ? (
+                <p className="font-serif text-lg">Washout — the wall ran out.</p>
+              ) : (
+                <>
+                  <h2 className="font-serif text-xl font-semibold">
+                    {state.players[state.result.winner!]!.name} wins ·{" "}
+                    {state.result.score!.tai} tai
+                    {state.result.score!.capped ? " (capped)" : ""}
+                  </h2>
+                  <ul className="mt-2 space-y-1 text-[0.9rem] text-muted-foreground">
+                    {state.result.score!.lines.map((l, i) => (
+                      <li key={i} className="flex justify-between gap-4">
+                        <span>{l.name}</span>
+                        <span className="text-brass">{l.tai} tai</span>
+                      </li>
+                    ))}
+                    {state.result.score!.lines.length === 0 && <li>Chicken hand — 0 tai.</li>}
+                  </ul>
+                  <p className="mt-3 text-[0.9rem]">
+                    {state.result.from === undefined
+                      ? `Self-drawn — each opponent pays ${state.result.points} points.`
+                      : `${state.players[state.result.from]!.name} threw the winning tile and pays ${state.result.points! * 3} points.`}
+                  </p>
+                </>
+              )}
+            </section>
+          )}
+        </div>
+
+        {/* Log */}
+        <aside className="rounded-lg border border-border bg-card/60 p-4">
+          <h2 className="text-[0.75rem] tracking-widest text-muted-foreground uppercase">
+            Table talk
+          </h2>
+          <ol className="mt-3 space-y-1.5 text-[0.82rem] leading-relaxed text-muted-foreground">
+            {state.log.map((l, i) => (
+              <li key={i} className={i === 0 ? "text-foreground" : undefined}>
+                {humanise(l)}
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </div>
     </div>
+  );
+}
+
+function humanise(line: string) {
+  return line.replace(/\b([cbd][1-9]|w[eswn]|g[rgw]|f[1-8]|a[1-4])\b/g, (m) => tileText(m));
+}
+
+function ActionButton({
+  children,
+  onClick,
+  primary,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  primary?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`cursor-pointer rounded-sm px-4 py-2 text-[0.88rem] font-medium transition-colors ${
+        primary
+          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+          : "border border-border bg-card text-foreground hover:border-brass"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

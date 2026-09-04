@@ -51,6 +51,16 @@
   --color-brass: var(--brass);
   --color-olive: var(--olive);
   --color-burgundy: var(--burgundy);
+  --color-felt: var(--felt);
+  --color-felt-deep: var(--felt-deep);
+  --color-tile: var(--tile);
+  --color-tile-edge: var(--tile-edge);
+  --color-tile-back: var(--tile-back);
+  --color-tile-back-edge: var(--tile-back-edge);
+  --color-ink: var(--ink);
+  --color-jade: var(--jade);
+  --color-cobalt: var(--cobalt);
+  --color-vermilion: var(--vermilion);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -68,43 +78,54 @@
 
 :root {
   --radius: 0.1875rem;
-  /* Parchment paper palette */
-  --background: oklch(0.938 0.017 91.5);
-  --foreground: oklch(0.283 0.041 256.8);
-  --card: oklch(0.995 0.004 95);
-  --card-foreground: oklch(0.283 0.041 256.8);
-  --popover: oklch(0.995 0.004 95);
-  --popover-foreground: oklch(0.283 0.041 256.8);
-  --primary: oklch(0.283 0.041 256.8);
-  --primary-foreground: oklch(0.938 0.017 91.5);
-  --secondary: oklch(0.912 0.02 93);
-  --secondary-foreground: oklch(0.283 0.041 256.8);
-  --muted: oklch(0.912 0.02 93);
-  --muted-foreground: oklch(0.492 0.018 253.5);
-  --accent: oklch(0.912 0.02 93);
-  --accent-foreground: oklch(0.283 0.041 256.8);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.858 0.023 90.2);
-  --input: oklch(0.858 0.023 90.2);
-  --ring: oklch(0.545 0.088 79.5);
-  /* Ecclesial accents */
-  --brass: oklch(0.545 0.088 79.5);
-  --olive: oklch(0.517 0.066 122.4);
-  --burgundy: oklch(0.403 0.108 15.6);
-  --chart-1: oklch(0.545 0.088 79.5);
-  --chart-2: oklch(0.517 0.066 122.4);
-  --chart-3: oklch(0.403 0.108 15.6);
-  --chart-4: oklch(0.283 0.041 256.8);
-  --chart-5: oklch(0.492 0.018 253.5);
-  --sidebar: oklch(0.938 0.017 91.5);
-  --sidebar-foreground: oklch(0.283 0.041 256.8);
-  --sidebar-primary: oklch(0.283 0.041 256.8);
-  --sidebar-primary-foreground: oklch(0.938 0.017 91.5);
-  --sidebar-accent: oklch(0.912 0.02 93);
-  --sidebar-accent-foreground: oklch(0.283 0.041 256.8);
-  --sidebar-border: oklch(0.858 0.023 90.2);
-  --sidebar-ring: oklch(0.545 0.088 79.5);
+  /* Mahjong parlour: deep felt table, warm ivory tiles */
+  --background: oklch(0.268 0.048 155);
+  --foreground: oklch(0.955 0.012 95);
+  --card: oklch(0.318 0.05 155);
+  --card-foreground: oklch(0.955 0.012 95);
+  --popover: oklch(0.318 0.05 155);
+  --popover-foreground: oklch(0.955 0.012 95);
+  --primary: oklch(0.72 0.13 78);
+  --primary-foreground: oklch(0.22 0.045 155);
+  --secondary: oklch(0.355 0.045 155);
+  --secondary-foreground: oklch(0.955 0.012 95);
+  --muted: oklch(0.355 0.045 155);
+  --muted-foreground: oklch(0.79 0.024 120);
+  --accent: oklch(0.355 0.045 155);
+  --accent-foreground: oklch(0.955 0.012 95);
+  --destructive: oklch(0.577 0.21 27.3);
+  --destructive-foreground: oklch(0.98 0.003 248);
+  --border: oklch(0.4 0.045 155);
+  --input: oklch(0.4 0.045 155);
+  --ring: oklch(0.72 0.13 78);
+  /* Table + tile surfaces */
+  --felt: oklch(0.318 0.05 155);
+  --felt-deep: oklch(0.235 0.045 155);
+  --tile: oklch(0.965 0.017 92);
+  --tile-edge: oklch(0.845 0.033 92);
+  --tile-back: oklch(0.62 0.1 33);
+  --tile-back-edge: oklch(0.5 0.1 33);
+  /* Tile inks */
+  --ink: oklch(0.29 0.02 250);
+  --jade: oklch(0.48 0.11 155);
+  --cobalt: oklch(0.45 0.13 255);
+  --vermilion: oklch(0.53 0.19 28);
+  --brass: oklch(0.72 0.13 78);
+  --olive: oklch(0.55 0.08 122);
+  --burgundy: oklch(0.45 0.13 16);
+  --chart-1: oklch(0.72 0.13 78);
+  --chart-2: oklch(0.55 0.08 122);
+  --chart-3: oklch(0.45 0.13 16);
+  --chart-4: oklch(0.45 0.13 255);
+  --chart-5: oklch(0.79 0.024 120);
+  --sidebar: oklch(0.268 0.048 155);
+  --sidebar-foreground: oklch(0.955 0.012 95);
+  --sidebar-primary: oklch(0.72 0.13 78);
+  --sidebar-primary-foreground: oklch(0.22 0.045 155);
+  --sidebar-accent: oklch(0.355 0.045 155);
+  --sidebar-accent-foreground: oklch(0.955 0.012 95);
+  --sidebar-border: oklch(0.4 0.045 155);
+  --sidebar-ring: oklch(0.72 0.13 78);
 }
 
 .dark {
